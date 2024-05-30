@@ -1,0 +1,54 @@
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 vPosition;
+attribute vec4 vColor;
+
+varying vec4 fColor;
+
+
+void
+main()
+{
+    gl_PointSize = 5.0;
+    gl_Position = vPosition;
+    fColor = vColor;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+varying vec4 fColor;
+void
+main()
+{
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="trabalho.js"></script>
+
+<body>
+<div>
+<canvas id="gl-canvas" width="512"" height="512"
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+</div>
+<div>
+<select id = "mymenu" size = "7">
+    <option value = "0">Point</option>
+    <option value = "1">Line</option>
+    <option value = "2">Polygon</option>
+</select>
+<button id = "Button1">End Polygon</button>
+</div>
+
+
+
+</body>
+</html>
