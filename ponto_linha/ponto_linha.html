@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGL Drawing</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+        #menu {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="glCanvas" width="800" height="600"></canvas>
+    <div id="menu">
+        <button onclick="setDrawMode('points')">Desenhar Pontos</button>
+        <button onclick="setDrawMode('line')">Desenhar Linha</button>
+    </div>
+    <script src="ponto_linha.js"></script>
+</body>
+</html>
