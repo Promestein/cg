@@ -4,12 +4,20 @@ var pointsIndividuais = [];
 var pointsLinhas = [];
 var program1;
 var program2;
+var program3;
 var bufferId1;
 var bufferId2;
+var bufferId3;
+var colorBufferId1;
+var colorBufferId2;
+var colorBufferId3;
+var vPosition;
+var vColor;
 var option = 0;
 var pointSize = 10.0;
 
 var t;
+var tColor = vec4(1.0, 1.0, 1.0, 1.0);
 var numPolygons = 0;
 var numIndices = [];
 numIndices[0] = 0;
@@ -20,52 +28,79 @@ var index = 0;
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
 
-    var menu = document.getElementById("mymenu");
+    var menu = document.getElementById("menuFuncao");
+    var menuColor = document.getElementById("menuColor");
     var button = document.getElementById("Button1");
 
     menu.addEventListener("click", function() {
         option = menu.selectedIndex;
-                // gl.clearColor(0.8, 0.8, 0.8, 1.0);
-        // gl.clear(gl.COLOR_BUFFER_BIT);
-        // pointsIndividuais = [];
-        // pointsLinhas = [];
-         });
+    });
+
+    menuColor.addEventListener("click", function() {
+        cindex = menuColor.selectedIndex;
+        if (cindex == 0) {
+            tColor = vec4(1.0, 1.0, 1.0, 1.0);
+        } else if (cindex == 1) {
+            tColor = vec4(1.0, 0.0, 0.0, 1.0);
+        } else if (cindex == 2) {
+            tColor = vec4(0.0, 1.0, 0.0, 1.0);
+        } else if (cindex == 3) {
+            tColor = vec4(0.0, 0.0, 1.0, 1.0);
+        }
+        console.log(tColor);
+    });
+
+    button.addEventListener("click", function(){
+        numPolygons++;
+        numIndices[numPolygons] = 0;
+        start[numPolygons] = index;
+        render();
+    });
 
     gl = WebGLUtils.setupWebGL(canvas);
     if (!gl) { alert("WebGL isn't available"); }
 
-    canvas.addEventListener("mousedown", function(event){
+    canvas.addEventListener("click", function(event){
         if(option == 2){
-            t  = vec2(2*event.clientX/canvas.width-1, 
-            2*(canvas.height-event.clientY)/canvas.height-1);
-            gl.bindBuffer( gl.ARRAY_BUFFER, bufferId );
+            var rect = canvas.getBoundingClientRect();
+            var x = 2 * (event.clientX - rect.left) / canvas.width - 1;
+            var y = 2 * (rect.bottom - event.clientY) / canvas.height - 1;
+            var t = vec2(x, y);
+            gl.bindBuffer( gl.ARRAY_BUFFER, bufferId3 );
             gl.bufferSubData(gl.ARRAY_BUFFER, 8*index, flatten(t));
 
-            // t = vec4(colors[cindex]);
-            
-            // gl.bindBuffer( gl.ARRAY_BUFFER, cBufferId );
-            // gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t));
+            gl.bindBuffer( gl.ARRAY_BUFFER, colorBufferId3 );
+            gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(tColor));
 
             numIndices[numPolygons]++;
             index++;
         } else 
         if(option == 0){
-            t  = vec2(2*event.clientX/canvas.width-1, 
-            2*(canvas.height-event.clientY)/canvas.height-1);
+            var rect = canvas.getBoundingClientRect();
+            var x = 2 * (event.clientX - rect.left) / canvas.width - 1;
+            var y = 2 * (rect.bottom - event.clientY) / canvas.height - 1;
+            var t = vec2(x, y);
 
             pointsIndividuais.push(t);
             gl.bindBuffer( gl.ARRAY_BUFFER, bufferId1 );
-            gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(pointsIndividuais));
-            console.log(pointsIndividuais)
-            console.log(gl.POINTS)
+            gl.bufferSubData(gl.ARRAY_BUFFER, 8*pointsIndividuais.length, flatten(t));
+
+            gl.bindBuffer( gl.ARRAY_BUFFER, colorBufferId1 );
+            gl.bufferSubData(gl.ARRAY_BUFFER, 16*pointsIndividuais.length, flatten(tColor));
+            render()
         }else if(option == 1){
             t  = vec2(2*event.clientX/canvas.width-1, 
             2*(canvas.height-event.clientY)/canvas.height-1);
             console.log(t)
-
-            gl.bindBuffer( gl.ARRAY_BUFFER, bufferId2 );
-            gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(t));
+            
             pointsLinhas.push(t);
+            gl.bindBuffer( gl.ARRAY_BUFFER, bufferId2 );
+            gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(pointsLinhas));
+            
+            gl.bindBuffer( gl.ARRAY_BUFFER, colorBufferId2 );
+            gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(tColor));
+
+            render()
         }
 
     } );
@@ -75,7 +110,7 @@ window.onload = function init() {
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0.8, 0.8, 0.8, 1.0);
 
-    // Load shaders and initialize attribute buffers
+    // Configuração do programa de pontos
     program1 = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program1);
 
@@ -83,11 +118,20 @@ window.onload = function init() {
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferId1);
     gl.bufferData(gl.ARRAY_BUFFER, 8 * 1000, gl.STATIC_DRAW);
 
-    var vPosition = gl.getAttribLocation(program1, "vPosition");
+    vPosition = gl.getAttribLocation(program1, "vPosition");
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
+    colorBufferId1 = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferId1);
+    gl.bufferData(gl.ARRAY_BUFFER, 16 * 1000, gl.STATIC_DRAW);
 
+    vColor = gl.getAttribLocation(program1, "vColor");
+    gl.vertexAttribPointer(vColor, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vColor);
+
+
+    // Configuração do programa de linhas
     program2 = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program2);
 
@@ -95,9 +139,38 @@ window.onload = function init() {
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferId2);
     gl.bufferData(gl.ARRAY_BUFFER, 8 * 1000, gl.DYNAMIC_DRAW);
 
-    var vPosition = gl.getAttribLocation(program2, "vPosition");
+    vPosition = gl.getAttribLocation(program2, "vPosition");
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
+
+    colorBufferId2 = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferId2);
+    gl.bufferData(gl.ARRAY_BUFFER, 16 * 1000, gl.STATIC_DRAW);
+
+    vColor = gl.getAttribLocation(program2, "vColor");
+    gl.vertexAttribPointer(vColor, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vColor);
+
+
+    // Configuração do programa de poligonos
+    program3 = initShaders(gl, "vertex-shader", "fragment-shader");
+    gl.useProgram(program3);
+
+    bufferId3 = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufferId3);
+    gl.bufferData(gl.ARRAY_BUFFER, 8 * 1000, gl.DYNAMIC_DRAW);
+
+    vPosition = gl.getAttribLocation(program3, "vPosition");
+    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vPosition);
+
+    colorBufferId3 = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferId3);
+    gl.bufferData(gl.ARRAY_BUFFER, 16 * 1000, gl.STATIC_DRAW);
+
+    vColor = gl.getAttribLocation(program3, "vColor");
+    gl.vertexAttribPointer(vColor, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vColor);
     
 
     render();
@@ -106,16 +179,48 @@ window.onload = function init() {
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    gl.useProgram( program1 );
-    for (var i = 0; i < pointsIndividuais.length; ++i) {
-        gl.drawArrays(gl.POINTS, i, 1);
+    if (pointsIndividuais.length > 0) {
+        gl.useProgram(program1);
+        gl.bindBuffer(gl.ARRAY_BUFFER, bufferId1);
+        vPosition = gl.getAttribLocation(program1, "vPosition");
+        gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(vPosition);
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferId1);
+        vColor = gl.getAttribLocation(program1, "vColor");
+        gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(vColor);
+        gl.drawArrays(gl.POINTS, 0, pointsIndividuais.length+1);
     }
 
-    gl.useProgram( program2 );
-    if (pointsLinhas.length >= 2 && option == 1) {
-        // gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(pointsLinhas));
-        for (var j = 0; j < pointsLinhas.length; j += 2) {
-            gl.drawArrays(gl.LINES, j, 2);
+    if (pointsLinhas.length > 0) {
+        gl.useProgram(program2);
+        gl.bindBuffer(gl.ARRAY_BUFFER, bufferId2);
+        vPosition = gl.getAttribLocation(program2, "vPosition");
+        gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(vPosition);
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferId2);
+        vColor = gl.getAttribLocation(program2, "vColor");
+        gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(vColor);
+        if(pointsLinhas.length % 2 == 0){
+            gl.drawArrays(gl.LINES, 0, pointsLinhas.length+1);
+        }else{
+            gl.drawArrays(gl.LINES, 0, pointsLinhas.length-1);
+        }
+    }
+
+    if (numPolygons > 0) {
+        gl.useProgram(program3);
+        gl.bindBuffer(gl.ARRAY_BUFFER, bufferId3);
+        vPosition = gl.getAttribLocation(program3, "vPosition");
+        gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(vPosition);
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBufferId3);
+        vColor = gl.getAttribLocation(program3, "vColor");
+        gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(vColor);
+        for(var i=0; i<numPolygons; i++) {
+            gl.drawArrays(gl.TRIANGLE_FAN, start[i], numIndices[i]);
         }
     }
 
