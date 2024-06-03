@@ -1,31 +1,25 @@
 <html>
 
 <script id="vertex-shader" type="x-shader/x-vertex">
-attribute vec4 vPosition;
-attribute vec4 vColor;
+    attribute vec4 vPosition;
+    attribute vec4 vColor;
+    varying vec4 fColor;
 
-varying vec4 fColor;
-
-
-void
-main()
-{
-    gl_PointSize = 5.0;
-    gl_Position = vPosition;
-    fColor = vColor;
-}
+    void main() {
+        gl_Position = vPosition;
+        gl_PointSize = 10.0;
+        fColor = vColor;
+    }
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
 
-precision mediump float;
+    precision mediump float;
+    varying vec4 fColor;
 
-varying vec4 fColor;
-void
-main()
-{
-    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-}
+    void main() {
+        gl_FragColor = fColor;
+    }
 </script>
 
 <script type="text/javascript" src="../Common/webgl-utils.js"></script>
@@ -35,20 +29,38 @@ main()
 
 <body>
 <div>
-<canvas id="gl-canvas" width="512"" height="512"
+<canvas id="gl-canvas" width="512" height="512">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 </div>
 <div>
-<select id = "mymenu" size = "7">
+<select id = "menuFuncao" size = "7">
     <option value = "0">Point</option>
     <option value = "1">Line</option>
     <option value = "2">Polygon</option>
 </select>
-<button id = "Button1">End Polygon</button>
+
+<select id = "menuColor" size = "7">
+    <option value = "0">Branco</option>
+    <option value = "1">Preto</option> 
+    <option value = "2">Vermelho</option>
+    <option value = "3">Verde</option>
+    <option value = "4">Azul</option>
+    <option value = "5">Rosa</option>
+    
+</select>
+
+<button id = "buttonDraw">Desenhar Polígono</button>
+<button id = "translacao">Translacao</button>
+<button id = "rotacao">Rotacao</button>
+<button id = "buttonClear">Limpar Canvas</button>
 </div>
 
 
 
 </body>
 </html>
+
+
+
+
