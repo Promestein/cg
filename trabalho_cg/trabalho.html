@@ -1,31 +1,25 @@
 <html>
 
 <script id="vertex-shader" type="x-shader/x-vertex">
-attribute vec4 vPosition;
-attribute vec4 vColor;
+    attribute vec4 vPosition;
+    attribute vec4 vColor;
+    varying vec4 fColor;
 
-varying vec4 fColor;
-
-
-void
-main()
-{
-    gl_PointSize = 5.0;
-    gl_Position = vPosition;
-    fColor = vColor;
-}
+    void main() {
+        gl_Position = vPosition;
+        gl_PointSize = 10.0;
+        fColor = vColor;
+    }
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
 
-precision mediump float;
+    precision mediump float;
+    varying vec4 fColor;
 
-varying vec4 fColor;
-void
-main()
-{
-    gl_FragColor = fColor;
-}
+    void main() {
+        gl_FragColor = fColor;
+    }
 </script>
 
 <script type="text/javascript" src="../Common/webgl-utils.js"></script>
@@ -35,7 +29,7 @@ main()
 
 <body>
 <div>
-<canvas id="gl-canvas" width="512"" height="512"
+<canvas id="gl-canvas" width="512" height="512">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 </div>
@@ -55,11 +49,18 @@ Oops ... your browser doesn't support the HTML5 canvas element
     <option value = "5">Rosa</option>
     
 </select>
+
 <button id = "buttonDraw">Desenhar Polígono</button>
-<button id = "buttonClear">Lmpar Canvas</button>
+<button id = "translacao">Translacao</button>
+<button id = "rotacao">Rotacao</button>
+<button id = "buttonClear">Limpar Canvas</button>
 </div>
 
 
 
 </body>
 </html>
+
+
+
+
